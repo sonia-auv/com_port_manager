@@ -101,6 +101,7 @@ namespace com_provider
             std::string ttyport;
             char role;
             uint8_t channel;
+            const char* auv;
 
     };
     

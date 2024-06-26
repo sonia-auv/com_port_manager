@@ -10,14 +10,20 @@ namespace com_provider
     ComProvider::ComProvider()
     : Node("underwater_com_provider_node"),_serialConn("/dev/MODEM",B115200)
     {
-        //BOOST_LOG_TRIVIAL(info)<<"Deserializing parameters....";
-        //Find_parameter("/connection/ttyport", ttyport);
-        //Find_parameter("/settings/role", role);
-        //Find_parameter("/settings/channel", channel);
-        //BOOST_LOG_TRIVIAL(info)<<"Deserialization done!";
-        role= 'a';
-        channel= 6;
-
+        try{
+            auv = std::getenv("AUV");
+            if (!strcmp(auv, "AUV8")){
+                role= 'a';
+                channel= 6;
+            }
+            else if(!strcmp(auv, "AUV7")){
+                role= 'b';
+                channel= 6;
+            }
+        }catch(...){
+            BOOST_LOG_TRIVIAL(error)<<"Could not set role and channel";
+        }
+        
         writeBuffer.reserve(BUFFER_SIZE);
 
         underwaterComPub=this->create_publisher<sonia_common_ros2::msg::UnderwaterCom>("/provider_underwater_com/recieve_msgs",100);
@@ -27,7 +33,7 @@ namespace com_provider
         read_packet_thread = std::thread(std::bind(&ComProvider::Read_packet,this));
 
         BOOST_LOG_TRIVIAL(info)<<"Setting the sensor";
-        
+
         Set_sensor();    
     }
 
