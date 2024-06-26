@@ -1,0 +1,6 @@
+#*********************Driver Parameters****************
+/com_port_manager/connection/tty_port: "/dev/MODEM"
+
+/com_port_manager/settings/role: "a"
+
+/com_port_manager/settings/channel: "6"
