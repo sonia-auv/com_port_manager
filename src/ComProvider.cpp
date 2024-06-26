@@ -10,11 +10,13 @@ namespace com_provider
     ComProvider::ComProvider()
     : Node("underwater_com_provider_node"),_serialConn("/dev/MODEM",B115200)
     {
-        BOOST_LOG_TRIVIAL(info)<<"Deserializing parameters....";
-        Find_parameter("/connection/ttyport", ttyport);
-        Find_parameter("/settings/role", role);
-        Find_parameter("/settings/channel", channel);
-        BOOST_LOG_TRIVIAL(info)<<"Deserialization done!";
+        //BOOST_LOG_TRIVIAL(info)<<"Deserializing parameters....";
+        //Find_parameter("/connection/ttyport", ttyport);
+        //Find_parameter("/settings/role", role);
+        //Find_parameter("/settings/channel", channel);
+        //BOOST_LOG_TRIVIAL(info)<<"Deserialization done!";
+        role= 'a';
+        channel= 6;
 
         writeBuffer.reserve(BUFFER_SIZE);
 
@@ -25,6 +27,7 @@ namespace com_provider
         read_packet_thread = std::thread(std::bind(&ComProvider::Read_packet,this));
 
         BOOST_LOG_TRIVIAL(info)<<"Setting the sensor";
+        
         Set_sensor();    
     }
 
@@ -167,6 +170,7 @@ namespace com_provider
     }
     void ComProvider::Manage_write()
     {
+        rclcpp::Rate(1);
         BOOST_LOG_TRIVIAL(info)<<"Packet isnt queue";
         while(!stop_write_thread){
             std::unique_lock<std::mutex> mlock(_write.mutex);
@@ -363,7 +367,7 @@ namespace com_provider
             this->get_parameter("com_port_manager"+parameter,attribute);
         }
         else{
-            BOOST_LOG_TRIVIAL(warning)<<"Could not find /com_port_manager "+parameter<<" using default.";
+            BOOST_LOG_TRIVIAL(warning)<<"Could not find /com_port_manager"+parameter<<" using default.";
             
         }
     }
