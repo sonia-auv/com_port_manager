@@ -91,6 +91,7 @@ namespace com_provider
 
             rclcpp::Subscription<sonia_common_ros2::msg::UnderwaterCom>::SharedPtr underwaterComSub;
             rclcpp::Publisher<sonia_common_ros2::msg::UnderwaterCom>::SharedPtr underwaterComPub;
+            //rclcpp::Service<>::SharedPtr underwaterComService;
 
             std::string writeBuffer;
             std::atomic_bool stop_write_thread = {false};

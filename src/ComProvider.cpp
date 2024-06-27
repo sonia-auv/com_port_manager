@@ -1,9 +1,11 @@
 #include <sstream>
 #include <iostream>
+#include <chrono>
 
 #include "boost/log/trivial.hpp"
 #include "com_port_manager/ComProvider.hpp"
 
+using namespace std::chrono_literals;
 using std::placeholders::_1;
 namespace com_provider
 {
@@ -15,6 +17,7 @@ namespace com_provider
             if (!strcmp(auv, "AUV8")){
                 role= 'a';
                 channel= 6;
+                BOOST_LOG_TRIVIAL(info)<<"Connected to AUV8: Role -> "+role<<", Channel -> "+channel;
             }
             else if(!strcmp(auv, "AUV7")){
                 role= 'b';
@@ -33,7 +36,7 @@ namespace com_provider
         read_packet_thread = std::thread(std::bind(&ComProvider::Read_packet,this));
 
         BOOST_LOG_TRIVIAL(info)<<"Setting the sensor";
-
+        std::this_thread::sleep_for(1s);
         Set_sensor();    
     }
 
@@ -150,6 +153,7 @@ namespace com_provider
         std::stringstream ss;
         std::string data;
         
+        BOOST_LOG_TRIVIAL(info)<<"Cmd trying to Queue: "+cmd;
         if(!check_CMD(cmd)){
             ss <<SOP<<DIR_CMD<< cmd;
 
@@ -177,7 +181,7 @@ namespace com_provider
     void ComProvider::Manage_write()
     {
         rclcpp::Rate(1);
-        BOOST_LOG_TRIVIAL(info)<<"Packet isnt queue";
+        BOOST_LOG_TRIVIAL(info)<<"Manage write thread started";
         while(!stop_write_thread){
             std::unique_lock<std::mutex> mlock(_write.mutex);
             _write.cond.wait(mlock);
@@ -190,7 +194,7 @@ namespace com_provider
         uint8_t i;
         char buffer[BUFFER_SIZE];
 
-        BOOST_LOG_TRIVIAL(info)<<"Payload is set";
+        BOOST_LOG_TRIVIAL(info)<<"Read packet thread started";
         while(!stop_read_thread){
             do{
                 _serialConn.ReadOnce((uint8_t*)buffer,0);
